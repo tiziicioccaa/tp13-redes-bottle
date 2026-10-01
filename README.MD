@@ -1,22 +1,20 @@
 # Prototipo de Diagnóstico e Inspección HTTP
 
 **Asignatura:** Programación sobre redes  
-**Trabajo Práctico:** N°13 - Preguntas Frecuentes (HTTP, Cookies, Redirecciones, Bottle)[span_0](start_span)[span_0](end_span)  
-**Curso:** 6° Año 7ma | **Grupo:** N° 2[span_1](start_span)[span_1](end_span)  
-**Integrantes:** Elias Ramos, Erik Atusparia, Mateo Florentin, Tiziano Ciocca[span_2](start_span)[span_2](end_span)  
-
----
+**Trabajo Práctico:** N°12 - Preguntas Frecuentes (HTTP, Cookies, Redirecciones, Bottle)  
+**Curso:** 6° Año 7ma | **Grupo:** N° 2  
+**Integrantes:** Elias Ramos, Erik Atusparia, Mateo Florentin, Tiziano Ciocca  
 
 ## Breve Descripción del Producto
 
-Este software es un prototipo de utilidad de diagnóstico de red compatible de forma nativa con **Windows** y **Linux**. Ha sido diseñado para auditar, probar e inspeccionar servicios web HTTP/HTTPS evaluando los conceptos trabajados en el TP N°13:
+Este software es un prototipo de utilidad de diagnóstico de red compatible de forma nativa con **Windows** y **Linux**. Ha sido diseñado para auditar, probar e inspeccionar servicios web HTTP/HTTPS:
 
-- Identificación y análisis de **Tipos MIME** (`Content-Type`)[span_3](start_span)[span_3](end_span).
-- Inspección de cabeceras de **Cookies** (`Set-Cookie`) y directivas de seguridad (`Secure`, `HttpOnly`)[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span).
-- Detección de mecanismos de **Redirección HTTP** (códigos `3xx` y cabeceras `Location`)[span_6](start_span)[span_6](end_span).
-- Envío de peticiones HTTP arbitrarias (`GET`, `POST`, `PUT`, `DELETE`) con soporte para **Autenticación HTTP Básica** (Basic Auth)[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span).
+- Identificación y análisis de **Tipos MIME** (`Content-Type`).
+- Inspección de cabeceras de **Cookies** (`Set-Cookie`) y directivas de seguridad (`Secure`, `HttpOnly`).
+- Detección de mecanismos de **Redirección HTTP** (códigos `3xx` y cabeceras `Location`).
+- Envío de peticiones HTTP arbitrarias (`GET`, `POST`, `PUT`, `DELETE`) con soporte para **Autenticación HTTP Básica** (Basic Auth).
 
-Está implementado íntegramente en Python utilizando exclusivamente su Biblioteca Estándar (PSL), garantizando ejecución inmediata sin dependencias externas[span_9](start_span)[span_9](end_span).
+Está implementado íntegramente en Python utilizando exclusivamente su Biblioteca Estándar (PSL), garantizando ejecución inmediata sin dependencias externas.
 
 ---
 
@@ -24,15 +22,15 @@ Está implementado íntegramente en Python utilizando exclusivamente su Bibliote
 
 ### Entorno de Ejecución
 - **Lenguaje:** Python 3.6 o superior.
-- **Dependencias externas:** Ninguna (utiliza paquetes nativos como `urllib`, `http.cookiejar` y `argparse`)[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span).
+- **Dependencias externas:** Ninguna (utiliza paquetes nativos como `urllib`, `http.cookiejar` y `argparse`).
 - **Sistemas Operativos Compatibles:** Windows 10/11, distribuciones Linux (Ubuntu, Debian, Fedora, etc.) y macOS.
 
 ### Pasos para Ejecutar
 
 1. **Clonar el repositorio o descargar el código:**
    ```bash
-   git clone <URL_DE_TU_REPOSI>
-   cd <tp-13-bottle>
+   git clone <URL_DE_TU_REPOSITORIO>
+   cd <TP-12-BOTTLE>
 2. **Ejecutar el programa directamente desde la terminal / consola de comandos:**
  ** Uso directo sin parámetros:**
      python main.py
