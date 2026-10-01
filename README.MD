@@ -1,7 +1,7 @@
 # Prototipo de Diagnóstico e Inspección HTTP
 
 **Asignatura:** Programación sobre redes  
-**Trabajo Práctico:** N°12 - Preguntas Frecuentes (HTTP, Cookies, Redirecciones, Bottle)  
+**Trabajo Práctico:** N°12
 **Curso:** 6° Año 7ma | **Grupo:** N° 2  
 **Integrantes:** Elias Ramos, Erik Atusparia, Mateo Florentin, Tiziano Ciocca  
 
@@ -29,7 +29,7 @@ Está implementado íntegramente en Python utilizando exclusivamente su Bibliote
 
 1. **Clonar el repositorio o descargar el código:**
    ```bash
-   git clone <URL_DE_TU_REPOSITORIO>
+   git clone <https://github.com/tiziicioccaa/tp13-redes-bottle/tree/main>
    cd <TP-12-BOTTLE>
 2. **Ejecutar el programa directamente desde la terminal / consola de comandos:**
  ** Uso directo sin parámetros:**
