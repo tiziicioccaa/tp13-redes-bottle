@@ -1,55 +1,74 @@
-# Prototipo de Diagnóstico e Inspección HTTP
+# Herramienta de diagnóstico e inspección HTTP
 
-**Asignatura:** Programación sobre redes  
-**Trabajo Práctico:** N°12
-**Curso:** 6° Año 7ma | **Grupo:** N° 2  
-**Integrantes:** Elias Ramos, Erik Atusparia, Mateo Florentin, Tiziano Ciocca  
+**Asignatura:** Programación sobre redes | **Trabajo Práctico:** N.º 13
 
-## Breve Descripción del Producto
+**Curso:** 6.º Año, 7.ª | **Grupo:** N.º 2
 
-Este software es un prototipo de utilidad de diagnóstico de red compatible de forma nativa con **Windows** y **Linux**. Ha sido diseñado para auditar, probar e inspeccionar servicios web HTTP/HTTPS:
+**Integrantes:** Elias Ramos, Erik Atusparia, Mateo Florentin y Tiziano Ciocca
 
-- Identificación y análisis de **Tipos MIME** (`Content-Type`).
-- Inspección de cabeceras de **Cookies** (`Set-Cookie`) y directivas de seguridad (`Secure`, `HttpOnly`).
-- Detección de mecanismos de **Redirección HTTP** (códigos `3xx` y cabeceras `Location`).
-- Envío de peticiones HTTP arbitrarias (`GET`, `POST`, `PUT`, `DELETE`) con soporte para **Autenticación HTTP Básica** (Basic Auth).
+## Descripción
 
-Está implementado íntegramente en Python utilizando exclusivamente su Biblioteca Estándar (PSL), garantizando ejecución inmediata sin dependencias externas.
+Aplicación de consola para inspeccionar servicios web HTTP y HTTPS. Permite consultar estados y redirecciones, revisar el tipo MIME y las cookies recibidas, y enviar peticiones HTTP con datos de formulario o autenticación HTTP Básica.
 
----
+## Requisitos
 
-## Requisitos e Instrucciones de Instalación y Ejecución
+- **Python:** 3.6 o posterior. El código utiliza f-strings, disponibles desde Python 3.6.
+- **Dependencias:** solo la biblioteca estándar de Python; no es necesario instalar paquetes con `pip`.
+- **Git:** necesario únicamente si se usa el comando `git clone` para descargar el proyecto.
+- **Sistemas operativos:** Windows 10/11, Linux y macOS, con Python instalado y disponible desde una terminal.
+- **Conexión de red:** necesaria para consultar servidores remotos. También se pueden probar servicios HTTP que se ejecuten en la misma PC.
 
-### Entorno de Ejecución
-- **Lenguaje:** Python 3.6 o superior.
-- **Dependencias externas:** Ninguna (utiliza paquetes nativos como `urllib`, `http.cookiejar` y `argparse`).
-- **Sistemas Operativos Compatibles:** Windows 10/11, distribuciones Linux (Ubuntu, Debian, Fedora, etc.) y macOS.
+## Instalación y ejecución
 
-### Pasos para Ejecutar
+1. Instala Python 3.6 o posterior desde [python.org](https://www.python.org/downloads/) si todavía no está instalado. En Windows puedes comprobarlo con `py --version`; en Linux o macOS, con `python3 --version`.
+2. Descarga el proyecto desde la terminal:
 
-1. **Clonar el repositorio o descargar el código:**
    ```bash
-   git clone <https://github.com/tiziicioccaa/tp13-redes-bottle/tree/main>
-   cd <TP-12-BOTTLE>
-2. **Ejecutar el programa directamente desde la terminal / consola de comandos:**
- ** Uso directo sin parámetros:**
-     python main.py
-**Uso pasando una URL de inicio mediante parámetros de terminal:**
-     python main.py -u http://localhost:8080
+   git clone https://github.com/tiziicioccaa/tp13-redes-bottle.git
+   cd tp13-redes-bottle
+   ```
 
-Lista de Operaciones Disponibles
-​El prototipo cuenta con un menú interactivo basado en consola de comandos. A continuación se detallan las operaciones disponibles:
+   Si ya tienes el repositorio descargado, abre una terminal en la carpeta que contiene `main.py`.
+3. Ejecuta el menú:
 
-**1.​[Diagnóstico] Auditar Estado HTTP y Redirecciones (3xx / Location):**
-    **​Descripción:** Realiza una petición hacia la URL destino, verifica el código de estado retornado e identifica si el servidor emitió un comando de redirección (como 301 o 302), informando la URL final alcanzada.  
-**2.​[Diagnóstico]Inspeccionar Tipos MIME y cookies 
-   ​**Descripción:** Analiza la cabecera Content-Type para clasificar el tipo MIME del recurso (text/html, application/json, etc.) y extrae las cookies enviadas por el servidor mediante Set-Cookie, evaluando el cumplimiento de parámetros de seguridad (Secure, HttpOnly).  
-**3.​[Operación de Entrada/Obtención de Datos]** 
- **Enviar Petición HTTP Personalizada:**
-      **​Descripción:** 
-          Permite al usuario interactuar activamente con el servidor web enviando parámetros en el cuerpo de la petición (POST/PUT) y autenticarse dinámicamente mediante credenciales HTTP Basic Auth (urllib.request.HTTPBasicAuthHandler). Retorna el código de respuesta y una vista previa del cuerpo recibido.  
-**4.​Cambiar URL de destino:**
-  ​. Descripción: Permite redefinir la dirección  IP o dominio a evaluar sin reiniciar la aplicación.
-**​5.Salir:**
-  ​**Descripción:** 
-         Finaliza la ejecución del  prototipo.
+   **Windows (PowerShell o Símbolo del sistema):**
+
+   ```powershell
+   py main.py
+   ```
+
+   **Linux o macOS:**
+
+   ```bash
+   python3 main.py
+   ```
+
+   En cualquiera de los sistemas también puedes indicar una URL inicial:
+
+   ```bash
+   py main.py -u https://github.com
+   ```
+
+   En Linux o macOS, sustituye `py` por `python3`. El argumento `-u` también puede escribirse `--url`; proporciona la URL completa, incluido `http://` o `https://`.
+
+## Menú y operaciones
+
+Al iniciar sin `-u`, el programa solicita una URL. Si se ingresa una dirección sin esquema, el menú le antepone `http://`. La URL actual se muestra sobre las opciones y se reutiliza hasta que se cambie.
+
+1. **Auditar estado HTTP y redirecciones:** envía una petición a la URL actual y muestra el código HTTP, si se siguió una redirección y la URL final. Las redirecciones se siguen automáticamente.
+2. **Inspeccionar MIME y cookies:** muestra el tipo MIME de la respuesta y las cookies recibidas. Para cada cookie informa nombre, valor, dominio y los atributos `Secure` y `HttpOnly`.
+3. **Enviar petición HTTP personalizada:**
+   - Ingresa un método. El menú ofrece `GET`, `POST`, `PUT` y `DELETE`; también se puede ingresar `PATCH` u otro método aceptado por `urllib`.
+   - Para `POST`, `PUT` o `PATCH`, puedes ingresar un único nombre y valor de parámetro; dejar vacío el nombre no agrega datos. Los parámetros se envían codificados como formulario (`application/x-www-form-urlencoded`).
+   - Indica si el recurso requiere autenticación HTTP Básica y, si corresponde, proporciona usuario y contraseña. La autenticación se configura solo si ambos campos tienen contenido.
+   - El resultado muestra el código HTTP y hasta 500 caracteres del cuerpo de respuesta.
+4. **Cambiar URL de destino:** solicita otra URL y vuelve al menú con ese nuevo destino. Si no se especifica el esquema, se antepone `http://`.
+5. **Salir:** finaliza la aplicación.
+
+## Límites e información importante
+
+- Cada solicitud tiene un tiempo de espera máximo de 10 segundos.
+- La operación de petición personalizada no permite definir cabeceras arbitrarias, enviar JSON ni agregar varios parámetros desde el menú. `GET` y `DELETE` no solicitan datos de formulario.
+- La autenticación implementada es HTTP Básica. Usa `https://` para proteger las credenciales durante el transporte; HTTP sin cifrado no las protege.
+- Al usar `-u`/`--url`, incluye el esquema en la URL; el prefijo automático solo se aplica a las direcciones escritas en el menú.
+- Los errores HTTP devueltos por el servidor se muestran como respuestas con su código de estado. Los errores de conexión se informan en las operaciones de diagnóstico o petición.
