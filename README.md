@@ -28,13 +28,13 @@ Pasos para Ejecutar
      (En sistemas Linux puede ser necesario usar python3 main.py)
 Lista de Operaciones Disponibles
 El prototipo cuenta con un menú interactivo basado en consola de comandos. A continuación se detallan las operaciones disponibles:
- * [Diagnóstico] Auditar Estado HTTP y Redirecciones (3xx / Location):
+1* [Diagnóstico] Auditar Estado HTTP y Redirecciones (3xx / Location):
    * Descripción: Realiza una petición hacia la URL destino, verifica el código de estado retornado e identifica si el servidor emitió un comando de redirección (como 301 o 302), informando la URL final alcanzada.
- * [Diagnóstico] Inspeccionar Tipos MIME y Cookies:
+2* [Diagnóstico] Inspeccionar Tipos MIME y Cookies:
    * Descripción: Analiza la cabecera Content-Type para clasificar el tipo MIME del recurso (text/html, application/json, etc.) y extrae las cookies enviadas por el servidor mediante Set-Cookie, evaluando el cumplimiento de parámetros de seguridad (Secure, HttpOnly).
- * [Operación de Entrada/Obtención de Datos] Enviar Petición HTTP Personalizada:
+3* [Operación de Entrada/Obtención de Datos] Enviar Petición HTTP Personalizada:
    * Descripción: Permite al usuario interactuar activamente con el servidor web enviando parámetros en el cuerpo de la petición (POST/PUT) y autenticarse dinámicamente mediante credenciales HTTP Basic Auth (urllib.request.HTTPBasicAuthHandler). Retorna el código de respuesta y una vista previa del cuerpo recibido.
- * Cambiar URL de destino:
+4 * Cambiar URL de destino:
    * Descripción: Permite redefinir la dirección IP o dominio a evaluar sin reiniciar la aplicación.
- * Salir:
+5 * Salir:
    * Descripción: Finaliza la ejecución del prototipo.
