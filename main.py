@@ -1,3 +1,4 @@
+"""Herramienta interactiva de diagnóstico e inspección de servicios HTTP."""
 
 import sys
 import argparse
@@ -9,10 +10,7 @@ from typing import Dict, Any
 
 
 def diagnostico_estado_y_redireccion(url: str) -> Dict[str, Any]:
-    """
-    Función de Diagnóstico 1: Analiza el estado HTTP y detecta si la URL posee redirecciones (3xx).
-    Maneja el seguimiento de cabeceras Location.
-    """
+    """Obtiene el estado HTTP y registra si la solicitud siguió una redirección."""
     resultado = {
         "url_original": url,
         "codigo_estado": None,
@@ -21,8 +19,8 @@ def diagnostico_estado_y_redireccion(url: str) -> Dict[str, Any]:
         "cabeceras": {}
     }
     
-    # Manejador personalizado para inspeccionar la redirección sin seguirla automáticamente de inmediato si se prefiere,
-    # o analizar el destino final.
+    # urllib sigue las redirecciones automáticamente; este manejador registra
+    # cuándo ocurren y cuál es su destino, conservando ese comportamiento.
     class NoRedirectionHandler(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):
             resultado["redireccionado"] = True
@@ -34,31 +32,33 @@ def diagnostico_estado_y_redireccion(url: str) -> Dict[str, Any]:
 
     try:
         with opener.open(req, timeout=10) as response:
+            # La URL de la respuesta permite informar el destino final tras redirecciones.
             resultado["codigo_estado"] = response.getcode()
             resultado["url_final"] = response.geturl()
             resultado["cabeceras"] = dict(response.info())
             if resultado["url_final"] != url:
                 resultado["redireccionado"] = True
     except urllib.error.HTTPError as e:
+        # HTTPError representa una respuesta HTTP recibida (por ejemplo, 404),
+        # por lo que su código y sus cabeceras también son datos del diagnóstico.
         resultado["codigo_estado"] = e.code
         resultado["cabeceras"] = dict(e.headers)
     except urllib.error.URLError as e:
+        # URLError indica que no se pudo completar la comunicación con el servidor.
         resultado["error"] = str(e.reason)
 
     return resultado
 
 
 def diagnostico_cookies_y_mime(url: str) -> Dict[str, Any]:
-    """
-    Función de Diagnóstico 2: Inspecciona los tipos MIME (Content-Type) retornados
-    y analiza la presencia de cookies enviadas por el servidor mediante Set-Cookie.
-    """
+    """Inspecciona el tipo MIME y las cookies que entrega el servidor."""
     resultado = {
         "tipo_mime": "Desconocido",
         "cookies_recibidas": [],
         "seguridad_cookies": []
     }
 
+    # CookieJar procesa las cabeceras Set-Cookie y expone los atributos de cada cookie.
     cj = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
     req = urllib.request.Request(url, headers={'User-Agent': 'HTTP-Diagnostic-Tool/1.0'})
@@ -66,10 +66,10 @@ def diagnostico_cookies_y_mime(url: str) -> Dict[str, Any]:
     try:
         with opener.open(req, timeout=10) as response:
             headers = response.info()
-            # Extraer tipo MIME
+            # El tipo MIME se obtiene de Content-Type, sin incluir parámetros como charset.
             resultado["tipo_mime"] = headers.get_content_type()
             
-            # Extraer y analizar cookies recibidas
+            # Se conservan atributos útiles para revisar las directivas de seguridad.
             for cookie in cj:
                 info_cookie = {
                     "nombre": cookie.name,
@@ -88,10 +88,10 @@ def diagnostico_cookies_y_mime(url: str) -> Dict[str, Any]:
 
 
 def operacion_peticion_personalizada(url: str, metodo: str = "GET", datos_form: dict = None, usuario: str = None, clave: str = None) -> Dict[str, Any]:
-    """
-    Operación de entrada/obtención de datos:
-    Permite al usuario enviar peticiones personalizadas con datos (POST/PUT),
-    o consumir recursos protegidos mediante Autenticación HTTP Básica (Basic Auth).
+    """Envía una petición HTTP, opcionalmente con formulario o autenticación básica.
+
+    Los datos de formulario se codifican como application/x-www-form-urlencoded.
+    El cuerpo de respuesta se limita a 500 caracteres para mostrarlo en la consola.
     """
     resultado = {
         "metodo": metodo,
@@ -99,7 +99,7 @@ def operacion_peticion_personalizada(url: str, metodo: str = "GET", datos_form: 
         "cuerpo_respuesta": None
     }
 
-    # Configuración de Autenticación HTTP Básica si se proporcionan credenciales
+    # La autenticación se configura solo cuando se proporcionan ambos campos.
     if usuario and clave:
         password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, usuario, clave)
@@ -108,7 +108,7 @@ def operacion_peticion_personalizada(url: str, metodo: str = "GET", datos_form: 
     else:
         opener = urllib.request.build_opener()
 
-    # Preparación de datos para métodos con cuerpo (POST/PUT/DELETE)
+    # Solo estos métodos reciben los datos de formulario preparados por el menú.
     data_bytes = None
     if datos_form and metodo.upper() in ["POST", "PUT", "PATCH"]:
         data_bytes = urllib.parse.urlencode(datos_form).encode('utf-8')
@@ -120,9 +120,10 @@ def operacion_peticion_personalizada(url: str, metodo: str = "GET", datos_form: 
         with opener.open(req, timeout=10) as response:
             resultado["codigo_estado"] = response.getcode()
             cuerpo = response.read().decode('utf-8', errors='replace')
-            # Truncar cuerpo si es muy extenso para la visualización
+            # Evita volcar respuestas extensas completas en la terminal.
             resultado["cuerpo_respuesta"] = cuerpo[:500] + ("..." if len(cuerpo) > 500 else "")
     except urllib.error.HTTPError as e:
+        # También se muestra el cuerpo devuelto por errores HTTP, como 401 o 404.
         resultado["codigo_estado"] = e.code
         resultado["cuerpo_respuesta"] = e.read().decode('utf-8', errors='replace')[:500]
     except urllib.error.URLError as e:
@@ -132,9 +133,7 @@ def operacion_peticion_personalizada(url: str, metodo: str = "GET", datos_form: 
 
 
 def menu_interactivo(url_defecto: str = None):
-    """
-    Interfaz de usuario con menú de comandos textual interactivo para la terminal.
-    """
+    """Ejecuta el menú de consola y permite cambiar la URL entre operaciones."""
     print("==========================================================")
     print("    HERRAMIENTA DE DIAGNÓSTICO E INSPECCIÓN DE RED (HTTP)  ")
     print("==========================================================")
@@ -144,6 +143,7 @@ def menu_interactivo(url_defecto: str = None):
     while True:
         if not url_actual:
             url_actual = input("\n[+] Ingrese la URL de destino (ej: http://localhost:8080 o https://httpbin.org): ").strip()
+            # Para las URL ingresadas en el menú, se asume HTTP si falta el esquema.
             if not url_actual.startswith("http://") and not url_actual.startswith("https://"):
                 url_actual = "http://" + url_actual
 
@@ -157,7 +157,7 @@ def menu_interactivo(url_defecto: str = None):
         opcion = input("\nSeleccione una opción (1-5): ").strip()
 
         if opcion == "1":
-            print("\nExecuting Diagnóstico de Estado y Redirección...")
+            print("\nEjecutando diagnóstico de estado y redirección...")
             res = diagnostico_estado_y_redireccion(url_actual)
             print(f" -> Código de Estado: {res.get('codigo_estado')}")
             print(f" -> Posee Redirección: {'Sí' if res.get('redireccionado') else 'No'}")
@@ -166,7 +166,7 @@ def menu_interactivo(url_defecto: str = None):
                 print(f" -> Error: {res['error']}")
 
         elif opcion == "2":
-            print("\nExecuting Diagnóstico de MIME y Cookies...")
+            print("\nEjecutando diagnóstico de MIME y cookies...")
             res = diagnostico_cookies_y_mime(url_actual)
             print(f" -> Tipo MIME Detectado: {res.get('tipo_mime')}")
             cookies = res.get("cookies_recibidas", [])
@@ -180,6 +180,7 @@ def menu_interactivo(url_defecto: str = None):
             print("\n--- Operación de Datos HTTP ---")
             metodo = input("Ingrese el método HTTP (GET/POST/PUT/DELETE) [GET]: ").strip().upper() or "GET"
             
+            # El menú permite cargar un único campo de formulario para estos métodos.
             datos = {}
             if metodo in ["POST", "PUT", "PATCH"]:
                 clave_p = input("Ingrese clave de parámetro de formulario (opcional): ").strip()
@@ -193,6 +194,7 @@ def menu_interactivo(url_defecto: str = None):
                 usr = input("Usuario: ").strip()
                 pwd = input("Contraseña: ").strip()
 
+            # Se informa el código y una vista previa del cuerpo de respuesta.
             print("\nEnviando petición...")
             res = operacion_peticion_personalizada(url_actual, metodo=metodo, datos_form=datos, usuario=usr, clave=pwd)
             print(f" -> Código de Estado: {res.get('codigo_estado')}")
@@ -200,6 +202,7 @@ def menu_interactivo(url_defecto: str = None):
             print(res.get("cuerpo_respuesta"))
 
         elif opcion == "4":
+            # La siguiente vuelta del menú vuelve a solicitar la URL de destino.
             url_actual = ""
 
         elif opcion == "5":
@@ -210,9 +213,7 @@ def menu_interactivo(url_defecto: str = None):
 
 
 def main():
-    """
-    Punto de entrada principal. Configura parámetros de entrada por terminal.
-    """
+    """Configura los argumentos de línea de comandos e inicia el menú."""
     parser = argparse.ArgumentParser(
         description="Herramienta CLI de Diagnóstico e Inspección HTTP según contenidos del TP N°13."
     )
@@ -226,5 +227,6 @@ def main():
     menu_interactivo(url_defecto=args.url)
 
 
+# Permite importar las funciones sin iniciar el menú interactivo.
 if __name__ == "__main__":
     main()
